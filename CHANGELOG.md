@@ -1,5 +1,17 @@
 # Changelog
 
+[English](CHANGELOG.md) / [Polski](CHANGELOG.pl.md)
+
+## 1.0.0-beta2 — 2026-10-28
+
+- English and Polish UI, help, diagnostics, errors and progress messages.
+- Automatic primary-system-language selection; manual System / English / Polski picker.
+- Native Android 13+ app-language settings and stored choice on Android 6–12.
+- Language changes cancel work and clear pending confirmation.
+- One universal APK; same public release key and package ID, versionCode101.
+- Bilingual install guides, forum drafts, documentation and release notes.
+- Protocol byte-vector tests retained; runtime tests include language recreation.
+
 ## 1.0.0-beta1 — 2026-10-28
 
 First public beta, author Grzegorz Staszczyk, MIT.

@@ -11,3 +11,8 @@ release/
 *.jks
 signing.json
 sdk-install.log
+
+qa/results-beta2/
+qa/source-archive-check*/
+qa/omniroute*.json
+qa/signed-tests-beta2*

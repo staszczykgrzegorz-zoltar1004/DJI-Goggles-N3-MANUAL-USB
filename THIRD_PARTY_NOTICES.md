@@ -1,5 +1,7 @@
 # Third-party notices
 
+[Polski](THIRD_PARTY_NOTICES.pl.md)
+
 N3 Manual application and original source: Copyright (c) 2026 Grzegorz
 Staszczyk, MIT; see LICENSE. DJI names identify compatible equipment and do not
 imply affiliation, sponsorship or endorsement.
