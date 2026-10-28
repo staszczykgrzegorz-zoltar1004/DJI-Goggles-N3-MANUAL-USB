@@ -1,0 +1,20 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'pl.stasz.n3manual'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'pl.stasz.n3manual'
+        minSdk 23
+        targetSdk 35
+        versionCode 100
+        versionName '1.0.0-beta1'
+        testInstrumentationRunner 'pl.stasz.n3manual.SmokeRunner'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures { buildConfig true }
+    buildTypes { release { debuggable false } }
+    sourceSets { androidTest.java.srcDirs += ['../tests'] }
+}

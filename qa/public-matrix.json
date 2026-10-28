@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-28",
+  "version": "1.0.0-beta1",
+  "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+  "emulator": "37.2.12 / 16428233 / WHPX",
+  "results": [
+    {
+      "api": 23,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 24.67,
+      "abi": "x86_64",
+      "android": "6.0",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 27,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 167.06,
+      "abi": "x86_64",
+      "android": "8.1.0",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 29,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 18.8,
+      "abi": "x86_64",
+      "android": "10",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 31,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 28.81,
+      "abi": "x86_64",
+      "android": "12",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 33,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 32.84,
+      "abi": "x86_64",
+      "android": "13",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 34,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 26.69,
+      "abi": "x86_64",
+      "android": "14",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 35,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 59.44,
+      "abi": "x86_64",
+      "android": "15",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    },
+    {
+      "api": 36,
+      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "physical_usb_tested": false,
+      "checks": [
+        "install exact signed release and matching test APK",
+        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "USB absent gives diagnostics, not silent help",
+        "portrait, 130% font, landscape remain usable and scrollable"
+      ],
+      "boot_seconds": 34.83,
+      "abi": "x86_64",
+      "android": "16",
+      "runtime_checks": 20,
+      "core_assertions": 87,
+      "status": "PASS"
+    }
+  ]
+}
