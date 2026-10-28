@@ -1,0 +1,13 @@
+.gradle/
+app/build/
+test-build/
+local.properties
+qa/avds/
+qa/results/
+qa/tools/
+qa/signed-tests.apk
+release/
+*.p12
+*.jks
+signing.json
+sdk-install.log
