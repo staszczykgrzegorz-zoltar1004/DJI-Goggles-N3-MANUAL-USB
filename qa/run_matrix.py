@@ -19,8 +19,9 @@ ROOT = Path(__file__).resolve().parent
 PROJECT = ROOT.parent
 SDK = Path(os.environ.get('ANDROID_HOME', str(Path.home() / 'AppData/Local/Android/Sdk')))
 ADB = SDK / 'platform-tools/adb.exe'
-APK = PROJECT / 'release/public/1.0.0-beta1/N3Manual-1.0.0-beta1.apk'
-TEST_APK = ROOT / 'signed-tests.apk'
+APK = PROJECT / 'release/public/1.0.0-beta2/N3Manual-1.0.0-beta2.apk'
+TEST_APK = ROOT / 'signed-tests-beta2.apk'
+RAM = int(os.environ.get("N3_QA_RAM_MB", "1536"))
 PORTS = queue.Queue()
 for port in (5580, 5582): PORTS.put(port)
 
@@ -45,13 +46,17 @@ def avd(api):
     # Keep that old image intact; use a separate clean disposable image.
     suffix = '_clean' if api == 36 else ''
     folder = ROOT / 'avds' / f'N3Manual_API{api}{suffix}.avd'
+    ini=folder.parent / f'N3Manual_API{api}.ini'
+    if ini.exists():
+        previous=re.search(r'^path=(.+)$',ini.read_text(),re.M)
+        if previous and Path(previous[1]).is_dir():folder=Path(previous[1])
     folder.mkdir(parents=True, exist_ok=True)
-    (folder.parent / f'N3Manual_API{api}.ini').write_text(
+    (ROOT / 'avds' / f'N3Manual_API{api}.ini').write_text(
         f'avd.ini.encoding=UTF-8\npath={folder}\ntarget=android-{api}\n', encoding='utf8')
     (folder / 'config.ini').write_text(
         f'AvdId=N3Manual_API{api}\navd.ini.displayname=N3 Manual QA API {api}\n'
         f'abi.type=x86_64\ntag.id=default\nimage.sysdir.1={image}\\\n'
-        'hw.cpu.arch=x86_64\nhw.cpu.ncore=2\nhw.ramSize=2048\n'
+        f'hw.cpu.arch=x86_64\nhw.cpu.ncore=2\nhw.ramSize={RAM}\n'
         'hw.lcd.width=720\nhw.lcd.height=1280\nhw.lcd.density=320\n'
         'hw.gpu.enabled=yes\nhw.gpu.mode=swiftshader\nhw.keyboard=yes\n'
         'disk.dataPartition.size=2048M\nshowDeviceFrame=no\n', encoding='utf8')
@@ -59,10 +64,10 @@ def avd(api):
 
 
 def run_api(api):
-    folder = ROOT / 'results' / f'api{api}'
+    folder = ROOT / 'results-beta2' / f'api{api}'
     folder.mkdir(parents=True, exist_ok=True)
     report = {'api': api, 'apk_sha256': hashlib.sha256(APK.read_bytes()).hexdigest(),
-              'physical_usb_tested': False, 'checks': []}
+              'physical_usb_tested': False, 'emulator_ram_mb': RAM, 'checks': []}
     process = None; serial = None; port = None
     try:
         avd(api)
@@ -72,7 +77,7 @@ def run_api(api):
         process = sp.Popen([str(SDK / 'emulator/emulator.exe'), '-avd', f'N3Manual_API{api}',
             '-port', str(port), '-no-window', '-no-audio', '-no-boot-anim', '-no-snapshot',
             '-feature', '-QuickbootFileBacked',
-            '-gpu', 'swiftshader', '-accel', 'on', '-memory', '2048', '-cores', '2'],
+            '-gpu', 'swiftshader', '-accel', 'on', '-memory', str(RAM), '-cores', '2'],
             env=env, stdout=log, stderr=sp.STDOUT, creationflags=sp.CREATE_NO_WINDOW)
         print(f'BOOT API {api} {serial}', flush=True)
         started = time.monotonic(); deadline = started + 420
@@ -116,10 +121,24 @@ def run_api(api):
         adb('shell','am','start','-W','-n','pl.stasz.n3manual/.MainActivity')
         nodes,raw=ui();(folder/'portrait.xml').write_bytes(raw)
         (folder/'portrait.png').write_bytes(adb('exec-out','screencap','-p',binary=True))
-        tap(nodes,'Połącz i sprawdź USB');nodes,raw=ui()
-        if not any(n.get('text')=='Diagnostyka USB' for n in nodes):raise RuntimeError('Missing diagnostic dialog')
+        if api==34:
+            tap(nodes,'Language / Język');nodes,raw=ui();tap(nodes,'Polski');nodes,raw=ui()
+            if not any(n.get('text')=='Połącz i sprawdź USB' for n in nodes):raise RuntimeError('Polish picker did not change UI')
+            (folder/'polish.png').write_bytes(adb('exec-out','screencap','-p',binary=True))
+            adb('shell','am','force-stop','pl.stasz.n3manual');adb('shell','am','start','-W','-n','pl.stasz.n3manual/.MainActivity')
+            nodes,raw=ui()
+            if not any(n.get('text')=='Połącz i sprawdź USB' for n in nodes):raise RuntimeError('Polish override not retained after restart')
+            tap(nodes,'Language / Język');nodes,raw=ui();tap(nodes,'English');nodes,raw=ui()
+            if not any(n.get('text')=='Connect and test USB' for n in nodes):raise RuntimeError('English picker did not change UI')
+            tap(nodes,'Language / Język');nodes,raw=ui()
+            (folder/'language-picker.png').write_bytes(adb('exec-out','screencap','-p',binary=True))
+            tap(nodes,'System (automatic)');nodes,raw=ui()
+            if not any(n.get('text')=='Connect and test USB' for n in nodes):raise RuntimeError('System fallback did not restore English')
+            report['checks'].append('visible language picker PL -> app restart -> EN -> System, Polish and picker screenshots')
+        tap(nodes,'Connect and test USB');nodes,raw=ui()
+        if not any(n.get('text')=='USB diagnostics' for n in nodes):raise RuntimeError('Missing diagnostic dialog')
         (folder/'diagnostics.xml').write_bytes(raw)
-        tap(nodes,'Zamknij');report['checks'].append('USB absent gives diagnostics, not silent help')
+        tap(nodes,'Close');report['checks'].append('USB absent gives diagnostics, not silent help')
         adb('shell','settings','put','system','font_scale','1.3')
         adb('shell','am','force-stop','pl.stasz.n3manual');adb('shell','am','start','-W','-n','pl.stasz.n3manual/.MainActivity')
         nodes,raw=ui();(folder/'large-font.xml').write_bytes(raw)

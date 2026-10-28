@@ -1,142 +1,123 @@
 {
+  "version": "1.0.0-beta2",
   "date": "2026-10-28",
-  "version": "1.0.0-beta1",
-  "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
-  "emulator": "37.2.12 / 16428233 / WHPX",
+  "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
+  "runtime_checks_per_pass": 44,
+  "core_assertions_per_pass": 87,
+  "resource_strings_per_language": 113,
   "results": [
     {
       "api": 23,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
       "physical_usb_tested": false,
+      "emulator_ram_mb": 2048,
       "checks": [
         "install exact signed release and matching test APK",
         "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
         "USB absent gives diagnostics, not silent help",
         "portrait, 130% font, landscape remain usable and scrollable"
       ],
-      "boot_seconds": 24.67,
+      "boot_seconds": 10.31,
       "abi": "x86_64",
       "android": "6.0",
-      "runtime_checks": 20,
+      "runtime_checks": 44,
       "core_assertions": 87,
       "status": "PASS"
     },
     {
       "api": 27,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
-      "physical_usb_tested": false,
-      "checks": [
-        "install exact signed release and matching test APK",
-        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
-        "USB absent gives diagnostics, not silent help",
-        "portrait, 130% font, landscape remain usable and scrollable"
-      ],
-      "boot_seconds": 167.06,
-      "abi": "x86_64",
-      "android": "8.1.0",
-      "runtime_checks": 20,
-      "core_assertions": 87,
-      "status": "PASS"
+      "android": "8.1",
+      "status": "NOT_RUN",
+      "reason": "host emulator startup blocked by insufficient free disk space",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
+      "physical_usb_tested": false
     },
     {
       "api": 29,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
       "physical_usb_tested": false,
+      "emulator_ram_mb": 2048,
       "checks": [
         "install exact signed release and matching test APK",
         "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
         "USB absent gives diagnostics, not silent help",
         "portrait, 130% font, landscape remain usable and scrollable"
       ],
-      "boot_seconds": 18.8,
+      "boot_seconds": 16.7,
       "abi": "x86_64",
       "android": "10",
-      "runtime_checks": 20,
+      "runtime_checks": 44,
       "core_assertions": 87,
       "status": "PASS"
     },
     {
       "api": 31,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
-      "physical_usb_tested": false,
-      "checks": [
-        "install exact signed release and matching test APK",
-        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
-        "USB absent gives diagnostics, not silent help",
-        "portrait, 130% font, landscape remain usable and scrollable"
-      ],
-      "boot_seconds": 28.81,
-      "abi": "x86_64",
       "android": "12",
-      "runtime_checks": 20,
-      "core_assertions": 87,
-      "status": "PASS"
+      "status": "NOT_RUN",
+      "reason": "host emulator startup blocked by insufficient free disk space",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
+      "physical_usb_tested": false
     },
     {
       "api": 33,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
       "physical_usb_tested": false,
+      "emulator_ram_mb": 2048,
       "checks": [
         "install exact signed release and matching test APK",
         "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
         "USB absent gives diagnostics, not silent help",
         "portrait, 130% font, landscape remain usable and scrollable"
       ],
-      "boot_seconds": 32.84,
+      "boot_seconds": 20.64,
       "abi": "x86_64",
       "android": "13",
-      "runtime_checks": 20,
+      "runtime_checks": 44,
       "core_assertions": 87,
       "status": "PASS"
     },
     {
       "api": 34,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
       "physical_usb_tested": false,
+      "emulator_ram_mb": 2048,
       "checks": [
         "install exact signed release and matching test APK",
         "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
+        "visible language picker PL -> app restart -> EN -> System, Polish and picker screenshots",
         "USB absent gives diagnostics, not silent help",
         "portrait, 130% font, landscape remain usable and scrollable"
       ],
-      "boot_seconds": 26.69,
+      "boot_seconds": 20.59,
       "abi": "x86_64",
       "android": "14",
-      "runtime_checks": 20,
+      "runtime_checks": 44,
       "core_assertions": 87,
       "status": "PASS"
     },
     {
       "api": 35,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
-      "physical_usb_tested": false,
-      "checks": [
-        "install exact signed release and matching test APK",
-        "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
-        "USB absent gives diagnostics, not silent help",
-        "portrait, 130% font, landscape remain usable and scrollable"
-      ],
-      "boot_seconds": 59.44,
-      "abi": "x86_64",
       "android": "15",
-      "runtime_checks": 20,
-      "core_assertions": 87,
-      "status": "PASS"
+      "status": "NOT_RUN",
+      "reason": "host emulator startup blocked by insufficient free disk space",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
+      "physical_usb_tested": false
     },
     {
       "api": 36,
-      "apk_sha256": "9c315ac97bfeff2187ece986488f8c17a5a6d5a6a30b6084fd1bab9f299396cd",
+      "apk_sha256": "e6f88f8a3027f355f0e6c96dd307f9fbfa6cd2ddba4830d382e8c447705ddd6b",
       "physical_usb_tested": false,
+      "emulator_ram_mb": 2048,
       "checks": [
         "install exact signed release and matching test APK",
         "framework lifecycle, permission denial, stale Confirm, recreation and protocol",
         "USB absent gives diagnostics, not silent help",
         "portrait, 130% font, landscape remain usable and scrollable"
       ],
-      "boot_seconds": 34.83,
+      "boot_seconds": 24.91,
       "abi": "x86_64",
       "android": "16",
-      "runtime_checks": 20,
+      "runtime_checks": 44,
       "core_assertions": 87,
       "status": "PASS"
     }
