@@ -97,7 +97,7 @@ def sign(source, destination):
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--input', type=Path, default=ROOT / 'app/build/outputs/apk/release/app-release-unsigned.apk')
-    p.add_argument('--output', type=Path, default=ROOT / 'release/public/1.0.0-beta1/N3Manual-1.0.0-beta1.apk')
+    p.add_argument('--output', type=Path, default=ROOT / 'release/public/1.0.0-beta2/N3Manual-1.0.0-beta2.apk')
     args = p.parse_args()
     result = sign(args.input.resolve(), args.output.resolve())
     (args.output.parent / (args.output.stem + '-signature.json')).write_text(json.dumps(result, indent=2), encoding='utf8')
