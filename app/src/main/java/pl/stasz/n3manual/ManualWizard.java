@@ -24,26 +24,26 @@ public final class ManualWizard {
             left=a;right=b;screen=new HashMap<>(s);verifyOnly=v;
         }
     }
-    static IOException changed(String text) { return new IOException(text); }
+    static UiFailure changed(String key,Object... args) { return new UiFailure(key,args); }
     static int unique(Map<Integer,String> nodes,String name) throws Exception {
         int found=-1;
         for(Map.Entry<Integer,String> e:nodes.entrySet()) if(name.equals(e.getValue())) {
-            if(found!=-1) throw changed("Niejednoznaczna pozycja: "+name);
+            if(found!=-1) throw changed("error_duplicate",name);
             found=e.getKey();
         }
-        if(found==-1) throw changed("Brak pozycji: "+name+". Sprawdź połączenie Neo i RC3.");
+        if(found==-1) throw changed("error_missing",name);
         return found;
     }
     static void focus(Ui ui,String first,String target,int bound) throws Exception {
         Map<Integer,String> n=ui.scan(); int a=unique(n,first), b=unique(n,target);
         int i=0;
         while(!ui.focused(a)) {
-            if(i++>=bound) throw changed("Nie znaleziono początku listy.");
+            if(i++>=bound) throw changed("error_list_start");
             ui.key("up");
         }
         i=0;
         while(!ui.focused(b)) {
-            if(i++>=bound) throw changed("Nie znaleziono zaznaczenia: "+target);
+            if(i++>=bound) throw changed("error_focus",target);
             ui.key("down");
         }
     }
@@ -67,27 +67,27 @@ public final class ManualWizard {
             }
             if(valid&&"Recenter Gimbal".equals(ui.text(rows.get(3),11))) matched.add(rows.get(5));
         }
-        if(matched.size()!=1) throw changed("Inny układ ustawień RC3. Użyj ręcznych strzałek.");
+        if(matched.size()!=1) throw changed("error_rc_layout");
         return matched.get(0);
     }
     public static Prepared prepare(Ui ui) throws Exception {
-        ui.progress("Powrót do widoku obrazu…");
+        ui.progress("progress_return");
         for(int i=0;i<6;i++) ui.key("back");
         ui.key("right");
         focus(ui,"menuitem.Status Entry","menuitem.Settings Entry",5);ui.key("ok");
         focus(ui,"menuitem.Security Entry","menuitem.Control Entry",6);ui.key("ok");
         focus(ui,"menuitem.Rc Settings Entry","menuitem.Rc Settings Entry",10);ui.key("ok");
-        ui.progress("Button Customization → Custom Mode…");
+        ui.progress("progress_custom");
         int custom=customMode(ui,ui.scan()); int count=0;
         while(!ui.focused(custom)) {
-            if(count++>=8) throw changed("Nie zaznaczono Custom Mode.");
+            if(count++>=8) throw changed("error_custom_focus");
             ui.key("down");
         }
         ui.key("ok");Map<Integer,String> before=ui.scan();
         int manual=unique(before,"menuitem.Manual Mode(0)");
         unique(before,"menuitem.Sport Mode(1)");count=0;
         while(!ui.focused(manual)) {
-            if(count++>=2) throw changed("Nie zaznaczono Manual Mode.");
+            if(count++>=2) throw changed("error_manual_focus");
             ui.key("up");
         }
         ui.key("ok");Map<Integer,String> after=ui.scan();
@@ -99,19 +99,19 @@ public final class ManualWizard {
         Collections.sort(buttons);
         if(buttons.isEmpty()&&"menuitem.Manual Mode(0)".equals(after.get(manual))&&ui.focused(manual))
             return new Prepared(-1,-1,after,true);
-        if(buttons.size()!=2||!ui.focused(buttons.get(0))) throw changed("Nie rozpoznano okna Confirm. Sprawdź obraz w goglach.");
+        if(buttons.size()!=2||!ui.focused(buttons.get(0))) throw changed("error_confirm_unknown");
         ui.key("right");
-        if(!ui.focused(buttons.get(1))) throw changed("Nie zaznaczono prawego przycisku.");
+        if(!ui.focused(buttons.get(1))) throw changed("error_right_focus");
         return new Prepared(buttons.get(0),buttons.get(1),after,false);
     }
     public static void confirm(Ui ui,Prepared state) throws Exception {
-        if(state==null||state.verifyOnly||!state.screen.equals(ui.scan())) throw changed("Ekran zmienił się. Uruchom krok 1 ponownie.");
+        if(state==null||state.verifyOnly||!state.screen.equals(ui.scan())) throw changed("error_screen_changed");
         for(int n:new int[]{state.left,state.right}) {
             String d=ui.text(n,9);
-            if(!"".equals(ui.text(n,0))||d==null||!d.startsWith("Button|")) throw changed("Inne okno potwierdzenia.");
+            if(!"".equals(ui.text(n,0))||d==null||!d.startsWith("Button|")) throw changed("error_different_confirm");
         }
-        if(ui.focused(state.left)||!ui.focused(state.right)) throw changed("Zmieniono zaznaczenie. Nie wysłano OK.");
+        if(ui.focused(state.left)||!ui.focused(state.right)) throw changed("error_focus_changed");
         ui.key("ok");
-        if(ui.text(state.right,0)!=null) throw changed("Okno nadal jest otwarte. Sprawdź komunikat w goglach.");
+        if(ui.text(state.right,0)!=null) throw changed("error_confirm_still_open");
     }
 }

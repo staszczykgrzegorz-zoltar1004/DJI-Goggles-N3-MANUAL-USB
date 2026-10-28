@@ -19,9 +19,9 @@ public final class UsbLink implements MenuLink {
     }
     public UsbLink(UsbManager manager,UsbDevice device,Log logger) throws Exception {
         log=logger;
-        if(!candidate(device)||!manager.hasPermission(device)) throw new IOException("Brak zgody Androida na dostęp do gogli.");
+        if(!candidate(device)||!manager.hasPermission(device)) throw new UiFailure("error_no_permission");
         if(!"987654321ABCDEF".equals(device.getSerialNumber()))
-            throw new IOException("Nie rozpoznano tego urządzenia jako testowanych N3. Nie podłączaj Neo do USB.");
+            throw new UiFailure("error_wrong_device");
         UsbInterface chosen=null;UsbEndpoint in=null,out=null;
         for(int i=0;i<device.getInterfaceCount();i++) {
             UsbInterface f=device.getInterface(i);
@@ -34,22 +34,22 @@ public final class UsbLink implements MenuLink {
             }
             if(in!=null&&out!=null) { chosen=f;break; }
         }
-        if(chosen==null) throw new IOException("Brak interfejsu menu. Telefon musi działać jako host USB/OTG, a gogle jak przy połączeniu z PC.");
+        if(chosen==null) throw new UiFailure("error_no_menu_interface");
         UsbDeviceConnection c=manager.openDevice(device);
-        if(c==null) throw new IOException("Nie otwarto USB. Zamknij DJI Fly i spróbuj ponownie.");
-        if(!c.claimInterface(chosen,true)) {c.close();throw new IOException("Interfejs USB zajęty. Zamknij DJI Fly i podłącz przewód ponownie.");}
+        if(c==null) throw new UiFailure("error_usb_open");
+        if(!c.claimInterface(chosen,true)) {c.close();throw new UiFailure("error_usb_busy");}
         conn=c;face=chosen;input=in;output=out;
-        log.write("USB: zweryfikowane N3, interfejs 4, OUT04/IN85");
+        log.write("USB: verified N3, interface 4, OUT04/IN85");
     }
     private int next() { sequence=(sequence+1)&65535;return sequence; }
     public byte[] read(int node,int field) throws Exception { return exchange(Duml.read(next(),node,field),500); }
     public void event(String key,int event) throws Exception {
         byte[] result=exchange(Duml.key(next(),key,event),1300);
-        if(result.length!=1||result[0]!=0) throw new IOException("Gogle nie potwierdziły klawisza.");
+        if(result.length!=1||result[0]!=0) throw new UiFailure("error_no_key_ack");
         log.write("GUI key "+key+" "+(event==0?"down":"up")+" ACK00");
     }
     private byte[] exchange(byte[] request,int timeout) throws Exception {
-        if(conn.bulkTransfer(output,request,request.length,500)!=request.length) throw new IOException("Przerwany zapis USB.");
+        if(conn.bulkTransfer(output,request,request.length,500)!=request.length) throw new UiFailure("error_usb_write");
         long deadline=SystemClock.elapsedRealtime()+timeout;
         byte[] buf=new byte[16384];
         while(SystemClock.elapsedRealtime()<deadline) {
@@ -57,7 +57,7 @@ public final class UsbLink implements MenuLink {
             if(n<=0) continue;
             for(byte[] r:parser.feed(buf,n)) if(Duml.matches(request,r)) return Duml.payload(r);
         }
-        throw new IOException("Brak odpowiedzi menu N3. Sprawdź kabel i rolę USB telefonu.");
+        throw new UiFailure("error_no_menu_reply");
     }
     @Override public void close() { conn.releaseInterface(face);conn.close(); }
 }

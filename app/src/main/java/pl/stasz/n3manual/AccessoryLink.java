@@ -20,11 +20,11 @@ public final class AccessoryLink implements MenuLink {
     }
     public AccessoryLink(UsbManager manager,UsbAccessory accessory,UsbLink.Log logger) throws Exception {
         log=logger;
-        if(!candidate(accessory)||!manager.hasPermission(accessory))throw new IOException("Brak rozpoznanego akcesorium DJI glass lub zgody Androida.");
+        if(!candidate(accessory)||!manager.hasPermission(accessory))throw new UiFailure("error_no_accessory");
         ParcelFileDescriptor opened=manager.openAccessory(accessory);
-        if(opened==null)throw new IOException("Kanał DJI jest zajęty. Zamknij DJI Fly, odepnij kabel i wybierz N3 Manual po ponownym podłączeniu.");
+        if(opened==null)throw new UiFailure("error_accessory_busy");
         fd=opened;
-        log.write("AOA: DJI glass / com.dji.logiclink; eksperymentalny odczyt GUI");
+        log.write("AOA: DJI glass / com.dji.logiclink; experimental GUI read");
         boolean found=false;
         try {
             // Read-only route discovery; no mode changes or video registration.
@@ -36,21 +36,21 @@ public final class AccessoryLink implements MenuLink {
                     found=true;break;
                 }
             }
-            if(!found)throw new IOException("Wykryto kanał DJI, lecz menu N3 nie odpowiedziało. Odczytano "+incoming+" B / "+controlPackets+" pakietów sterujących. Zapisz raport diagnostyczny.");
-            log.write("AOA: root GUI potwierdzony, sender="+sender);
+            if(!found)throw new UiFailure("error_accessory_probe",incoming,controlPackets);
+            log.write("AOA: root GUI verified, sender="+sender);
         } catch(Exception e) {log.write("AOA probe stop: B="+incoming+", control="+controlPackets+", identity="+identityReplies);fd.close();throw e;}
     }
     private int next(){sequence=(sequence+1)&65535;return sequence;}
     private boolean poll(short mask,int timeout) throws Exception {
         StructPollfd p=new StructPollfd();p.fd=fd.getFileDescriptor();p.events=mask;
         int n=Os.poll(new StructPollfd[]{p},timeout);
-        if((p.revents&(OsConstants.POLLERR|OsConstants.POLLHUP|OsConstants.POLLNVAL))!=0)throw new IOException("Odłączono kanał USB DJI.");
+        if((p.revents&(OsConstants.POLLERR|OsConstants.POLLHUP|OsConstants.POLLNVAL))!=0)throw new UiFailure("error_accessory_detached");
         return n>0&&(p.revents&mask)!=0;
     }
     private void send(byte[] packet) throws Exception {
         byte[] out=LogicTunnel.wrap(packet);
-        if(!poll((short)OsConstants.POLLOUT,500))throw new IOException("Kanał DJI nie przyjmuje danych.");
-        if(Os.write(fd.getFileDescriptor(),out,0,out.length)!=out.length)throw new IOException("Niepełny zapis kanału DJI.");
+        if(!poll((short)OsConstants.POLLOUT,500))throw new UiFailure("error_accessory_write_blocked");
+        if(Os.write(fd.getFileDescriptor(),out,0,out.length)!=out.length)throw new UiFailure("error_accessory_write");
     }
     private byte[] exchange(byte[] request,int timeout) throws Exception {
         send(request);long deadline=SystemClock.elapsedRealtime()+timeout;byte[] buffer=new byte[16384];
@@ -76,14 +76,14 @@ public final class AccessoryLink implements MenuLink {
     }
     @Override public byte[] read(int node,int field) throws Exception {
         byte[] p=exchange(Duml.read(next(),node,field,sender),700);
-        if(p==null)throw new IOException("Menu nie odpowiedziało przez kanał DJI. Zapisz raport.");return p;
+        if(p==null)throw new UiFailure("error_accessory_no_reply");return p;
     }
     @Override public void event(String name,int event) throws Exception {
         byte[] p=exchange(Duml.key(next(),name,event,sender),1300);
-        if(p==null||p.length!=1||p[0]!=0)throw new IOException("Brak potwierdzenia klawisza przez kanał DJI.");
+        if(p==null||p.length!=1||p[0]!=0)throw new UiFailure("error_accessory_no_key");
         log.write("AOA GUI "+name+" "+(event==0?"down":"up")+" ACK00");
     }
     @Override public void close() throws IOException {
-        log.write("AOA: odebrano "+incoming+" B, control="+controlPackets+", identity/heartbeat replies="+identityReplies);fd.close();
+        log.write("AOA: received "+incoming+" B, control="+controlPackets+", identity/heartbeat replies="+identityReplies);fd.close();
     }
 }

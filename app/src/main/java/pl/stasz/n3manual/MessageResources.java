@@ -1,0 +1,51 @@
+package pl.stasz.n3manual;
+import java.util.*;
+final class MessageResources {
+    static final Map<String,Integer> IDS=new HashMap<>();
+    static {
+        IDS.put("error_no_permission",R.string.error_no_permission);
+        IDS.put("error_wrong_device",R.string.error_wrong_device);
+        IDS.put("error_no_menu_interface",R.string.error_no_menu_interface);
+        IDS.put("error_usb_open",R.string.error_usb_open);
+        IDS.put("error_usb_busy",R.string.error_usb_busy);
+        IDS.put("error_no_key_ack",R.string.error_no_key_ack);
+        IDS.put("error_usb_write",R.string.error_usb_write);
+        IDS.put("error_no_menu_reply",R.string.error_no_menu_reply);
+        IDS.put("error_no_accessory",R.string.error_no_accessory);
+        IDS.put("error_accessory_busy",R.string.error_accessory_busy);
+        IDS.put("error_accessory_detached",R.string.error_accessory_detached);
+        IDS.put("error_accessory_write_blocked",R.string.error_accessory_write_blocked);
+        IDS.put("error_accessory_write",R.string.error_accessory_write);
+        IDS.put("error_accessory_no_reply",R.string.error_accessory_no_reply);
+        IDS.put("error_accessory_no_key",R.string.error_accessory_no_key);
+        IDS.put("error_cancelled",R.string.error_cancelled);
+        IDS.put("error_timeout",R.string.error_timeout);
+        IDS.put("error_text_field",R.string.error_text_field);
+        IDS.put("error_unknown_key",R.string.error_unknown_key);
+        IDS.put("error_read_range",R.string.error_read_range);
+        IDS.put("error_key_event",R.string.error_key_event);
+        IDS.put("error_client_address",R.string.error_client_address);
+        IDS.put("error_usb_buffer",R.string.error_usb_buffer);
+        IDS.put("error_tunnel_buffer",R.string.error_tunnel_buffer);
+        IDS.put("error_list_start",R.string.error_list_start);
+        IDS.put("error_rc_layout",R.string.error_rc_layout);
+        IDS.put("error_custom_focus",R.string.error_custom_focus);
+        IDS.put("error_manual_focus",R.string.error_manual_focus);
+        IDS.put("error_confirm_unknown",R.string.error_confirm_unknown);
+        IDS.put("error_right_focus",R.string.error_right_focus);
+        IDS.put("error_screen_changed",R.string.error_screen_changed);
+        IDS.put("error_different_confirm",R.string.error_different_confirm);
+        IDS.put("error_focus_changed",R.string.error_focus_changed);
+        IDS.put("error_confirm_still_open",R.string.error_confirm_still_open);
+        IDS.put("error_no_root",R.string.error_no_root);
+        IDS.put("error_report_open",R.string.error_report_open);
+        IDS.put("error_duplicate",R.string.error_duplicate);
+        IDS.put("error_missing",R.string.error_missing);
+        IDS.put("error_focus",R.string.error_focus);
+        IDS.put("error_accessory_probe",R.string.error_accessory_probe);
+        IDS.put("progress_return",R.string.progress_return);
+        IDS.put("progress_custom",R.string.progress_custom);
+        IDS.put("progress_scan",R.string.progress_scan);
+        IDS.put("progress_key",R.string.progress_key);
+    }
+}

@@ -32,7 +32,7 @@ public final class MainActivity extends Activity {
     private ManualWizard.Prepared prepared;
     private TextView connection,status;
     private CheckBox stationary;
-    private Button connect,prepare,confirm,stop;
+    private Button connect,prepare,confirm,stop,language;
     private LinearLayout content;
     private interface Job { Object run(GuiSession ui) throws Exception; }
 
@@ -41,19 +41,20 @@ public final class MainActivity extends Activity {
             if(PERMISSION.equals(intent.getAction())) {
                 boolean wanted=permissionPending; permissionPending=false;
                 if(wanted&&hasUsbPermission()) probe();
-                else if(wanted) status.setText("Brak zgody na USB. Dotknij Połącz, aby spróbować ponownie.");
+                else if(wanted) status.setText(getString(R.string.permission_denied));
             } else if(UsbManager.ACTION_USB_DEVICE_DETACHED.equals(intent.getAction())) {
                 UsbDevice detached=intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 if(selected!=null&&detached!=null&&selected.getDeviceId()==detached.getDeviceId()) {
                     usbGeneration++;cancel.set(true);prepared=null;ready=false;selected=null;
-                    connection.setText("Gogle odłączone");status.setText("Przerwano — odłączono USB.");updateControls();
+                    connection.setText(getString(R.string.goggles_detached));status.setText(getString(R.string.usb_cancelled));updateControls();
                 }
             } else if(UsbManager.ACTION_USB_ACCESSORY_DETACHED.equals(intent.getAction())) {
                 usbGeneration++;cancel.set(true);prepared=null;ready=false;selectedAccessory=null;
-                connection.setText("Odłączono kanał DJI");status.setText("Podłącz ponownie N3 i dotknij Połącz.");updateControls();
+                connection.setText(getString(R.string.dji_detached));status.setText(getString(R.string.reconnect));updateControls();
             }
         }
     };
+    @Override protected void attachBaseContext(Context base) {super.attachBaseContext(AppLanguage.wrap(base));}
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);manager=(UsbManager)getSystemService(USB_SERVICE);
         getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);
@@ -66,41 +67,43 @@ public final class MainActivity extends Activity {
         });
         setContentView(scroll);
         text(content,"N3 MANUAL",13,MINT,true);
-        text(content,"Manual, bez przycisku 5D",27,INK,true);
+        text(content,getString(R.string.title),27,INK,true);
         text(content,"DJI Goggles N3 · Neo · FPV RC3",14,MUTED,false);
+        language=button(content,getString(R.string.language_button),false);
+        language.setOnClickListener(v->chooseLanguage());
         LinearLayout usb=card();
-        connection=text(usb,"Podłącz gogle do telefonu",17,INK,true);
-        connect=button(usb,"Połącz i sprawdź USB",true);connect.setOnClickListener(v->connect());
-        Button usbState=button(usb,"Pokaż stan USB",false);usbState.setOnClickListener(v->diagnostics());
-        text(usb,"Tylko gogle na USB. Neo i RC3 połączone radiowo. Zamknij DJI Fly.",14,MUTED,false);
+        connection=text(usb,getString(R.string.connect_hint),17,INK,true);
+        connect=button(usb,getString(R.string.connect),true);connect.setOnClickListener(v->connect());
+        Button usbState=button(usb,getString(R.string.usb_state),false);usbState.setOnClickListener(v->diagnostics());
+        text(usb,getString(R.string.usb_hint),14,MUTED,false);
         LinearLayout restore=card();
-        text(restore,"Przywróć przypisanie M",20,INK,true);
-        stationary=new CheckBox(this);stationary.setText("Zestaw na stole, śmigła zdjęte, silniki wyłączone");
+        text(restore,getString(R.string.restore),20,INK,true);
+        stationary=new CheckBox(this);stationary.setText(getString(R.string.bench));
         stationary.setTextColor(INK);stationary.setTextSize(14);stationary.setButtonTintList(ColorStateList.valueOf(MINT));restore.addView(stationary);
-        prepare=button(restore,"1. Przejdź do Manual",true);
+        prepare=button(restore,getString(R.string.prepare),true);
         prepare.setOnClickListener(v->{
-            if(!stationary.isChecked()) {status.setText("Przygotuj zestaw na stole i zaznacz pole powyżej.");return;}
+            if(!stationary.isChecked()) {status.setText(getString(R.string.bench_required));return;}
             prepared=null;start("prepare",ManualWizard::prepare);
         });
-        text(restore,"Spójrz w gogle. Jeśli prawy przycisk ma napis Confirm, użyj kroku 2.",14,MUTED,false);
-        confirm=button(restore,"2. Widzę Confirm — zatwierdź",false);
+        text(restore,getString(R.string.confirm_hint),14,MUTED,false);
+        confirm=button(restore,getString(R.string.confirm),false);
         confirm.setOnClickListener(v->{
             if(!stationary.isChecked()||prepared==null)return;
             ManualWizard.Prepared state=prepared;prepared=null;
             start("confirm",ui->{ManualWizard.confirm(ui,state);return null;});
         });
-        status=text(restore,"Najpierw połącz gogle. Polecenia są wysyłane dopiero po dotknięciu przycisku.",15,INK,false);
-        stop=button(restore,"Przerwij",false);stop.setOnClickListener(v->{cancel.set(true);prepared=null;status.setText("Przerywam po zwolnieniu klawisza…");});
-        LinearLayout arrows=card();text(arrows,"Ręczny pilot menu",19,INK,true);
+        status=text(restore,getString(R.string.initial_status),15,INK,false);
+        stop=button(restore,getString(R.string.cancel),false);stop.setOnClickListener(v->{cancel.set(true);prepared=null;status.setText(getString(R.string.cancelling));});
+        LinearLayout arrows=card();text(arrows,getString(R.string.remote),19,INK,true);
         LinearLayout row=new LinearLayout(this);arrows.addView(row);
-        key(row,"← Lewo","left");key(row,"↑ Góra","up");key(row,"Prawo →","right");
+        key(row,getString(R.string.left),"left");key(row,getString(R.string.up),"up");key(row,getString(R.string.right),"right");
         row=new LinearLayout(this);arrows.addView(row);
-        key(row,"Wstecz","back");key(row,"↓ Dół","down");key(row,"OK","ok");
+        key(row,getString(R.string.back),"back");key(row,getString(R.string.down),"down");key(row,getString(R.string.ok),"ok");
         LinearLayout extra=card();
-        Button help=button(extra,"Jak podłączyć USB / OTG",false);help.setOnClickListener(v->help());
-        Button diagnostics=button(extra,"Diagnostyka i raport",false);diagnostics.setOnClickListener(v->diagnostics());
-        Button about=button(extra,"O aplikacji i prywatności",false);about.setOnClickListener(v->about());
-        text(content,"N3 Manual "+BuildConfig.VERSION_NAME+" · niezależne narzędzie\nPrzywraca wybór w menu. Nie zamraża ustawień na stałe.",12,MUTED,false);
+        Button help=button(extra,getString(R.string.help),false);help.setOnClickListener(v->help());
+        Button diagnostics=button(extra,getString(R.string.diagnostics),false);diagnostics.setOnClickListener(v->diagnostics());
+        Button about=button(extra,getString(R.string.about),false);about.setOnClickListener(v->about());
+        text(content,getString(R.string.footer,BuildConfig.VERSION_NAME),12,MUTED,false);
         IntentFilter filter=new IntentFilter(PERMISSION);filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
         registerUsbReceiver(filter);
@@ -120,7 +123,7 @@ public final class MainActivity extends Activity {
     @Override protected void onStop() {foreground=false;cancel.set(true);prepared=null;updateControls();super.onStop();}
     @Override protected void onDestroy() {alive=false;cancel.set(true);worker.shutdown();unregisterReceiver(receiver);super.onDestroy();}
     private void refresh() {
-        if(manager==null) {ready=false;prepared=null;connection.setText("Ten system nie udostępnia obsługi USB.");updateControls();return;}
+        if(manager==null) {ready=false;prepared=null;connection.setText(getString(R.string.no_usb_service));updateControls();return;}
         List<UsbDevice> found=new ArrayList<>();for(UsbDevice d:manager.getDeviceList().values())if(UsbLink.candidate(d))found.add(d);
         List<UsbAccessory> accessories=new ArrayList<>();UsbAccessory[] all=manager.getAccessoryList();
         if(all!=null)for(UsbAccessory a:all)if(AccessoryLink.candidate(a))accessories.add(a);
@@ -130,17 +133,17 @@ public final class MainActivity extends Activity {
                 UsbAccessory a=accessories.get(0);
                 if(selectedAccessory==null||!selectedAccessory.equals(a)){usbGeneration++;ready=false;prepared=null;}
                 selectedAccessory=a;
-                connection.setText(ready?"N3 połączone · kanał DJI odpowiada":"Wykryto kanał DJI telefonu · dotknij Połącz");
+                connection.setText(ready?getString(R.string.dji_connected):getString(R.string.dji_detected));
             } else {
                 selectedAccessory=null;ready=false;prepared=null;
-                connection.setText(found.isEmpty()?"Nie wykryto połączenia USB z N3":"Podłącz tylko jedne gogle DJI");
+                connection.setText(found.isEmpty()?getString(R.string.no_goggles):getString(R.string.one_goggles));
             }
         } else {
             UsbDevice d=found.get(0);
             if(selected==null||selected.getDeviceId()!=d.getDeviceId()) {usbGeneration++;ready=false;prepared=null;}
             selected=d;
             selectedAccessory=null;
-            connection.setText(ready?"N3 połączone · menu odpowiada":"Wykryto urządzenie DJI · sprawdź połączenie");
+            connection.setText(ready?getString(R.string.menu_connected):getString(R.string.usb_detected));
         }
         if(!hasUsbPermission())ready=false;
         updateControls();
@@ -148,8 +151,8 @@ public final class MainActivity extends Activity {
     private void connect() {
         if(busy||manager==null)return;refresh();
         if(selected==null&&selectedAccessory==null) {
-            status.setText("Brak dostępu do N3: Android nie udostępnia ani urządzenia host USB, ani kanału DJI. Dotknij Pokaż stan USB.");
-            log("Connect: brak urządzenia i rozpoznanego akcesorium");diagnostics();return;
+            status.setText(getString(R.string.no_connection));
+            log(getString(R.string.no_device_log));diagnostics();return;
         }
         prepared=null;ready=false;
         if(hasUsbPermission())probe();
@@ -163,7 +166,7 @@ public final class MainActivity extends Activity {
         return manager!=null&&(selected!=null&&manager.hasPermission(selected)||selectedAccessory!=null&&manager.hasPermission(selectedAccessory));
     }
     private void probe() {
-        start("probe",ui->{if(!"root".equals(ui.text(0,0)))throw new Exception("Brak rozpoznanej odpowiedzi GUI N3.");return null;});
+        start("probe",ui->{if(!"root".equals(ui.text(0,0)))throw new UiFailure("error_no_root");return null;});
     }
     private void key(LinearLayout row,String label,String code) {
         Button b=button(row,label,false);b.setTextSize(13);
@@ -175,26 +178,26 @@ public final class MainActivity extends Activity {
         final UsbDevice device=selected;final UsbAccessory accessory=selectedAccessory;final long generation=usbGeneration;
         busy=true;cancel.set(false);updateControls();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        status.setText("Łączę z menu gogli…");log("Start "+operation);
+        status.setText(getString(R.string.connecting));log("Start "+operation);
         worker.execute(()-> {
             Object result=null;String error=null;
             try(MenuLink link=device!=null?new UsbLink(manager,device,this::log):new AccessoryLink(manager,accessory,this::log)) {
-                GuiSession ui=new GuiSession(link,cancel,message->{log(message);post(()->{if(foreground&&generation==usbGeneration)status.setText(message);});});
+                GuiSession ui=new GuiSession(link,cancel,message->{log(message);post(()->{if(foreground&&generation==usbGeneration)status.setText(message);});},this::phrase);
                 result=job.run(ui);
-                if(cancel.get())throw new Exception("Przerwano operację.");
-            } catch(Exception e) {error=e.getMessage()==null?e.toString():e.getMessage();log("Stop: "+error);}
+                if(cancel.get())throw new UiFailure("error_cancelled");
+            } catch(Exception e) {error=e instanceof UiFailure?phrase(((UiFailure)e).key,((UiFailure)e).arguments):(e.getMessage()==null?e.toString():e.getMessage());log("Stop: "+error);}
             final Object value=result;final String problem=error;
             post(()-> {
                 busy=false;getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 if(!foreground||generation!=usbGeneration) {prepared=null;updateControls();return;}
-                if(problem!=null) {prepared=null;if(operation.equals("probe"))ready=false;status.setText("Zatrzymano: "+problem);}
-                else if(operation.equals("probe")) {ready=true;connection.setText("N3 połączone · menu odpowiada");status.setText("Połączono. Możesz użyć kreatora lub strzałek.");}
+                if(problem!=null) {prepared=null;if(operation.equals("probe"))ready=false;status.setText(getString(R.string.stopped_prefix,problem));}
+                else if(operation.equals("probe")) {ready=true;connection.setText(getString(R.string.menu_connected));status.setText(getString(R.string.connected_status));}
                 else if(operation.equals("prepare")) {
                     ManualWizard.Prepared p=(ManualWizard.Prepared)value;
-                    if(p.verifyOnly) {prepared=null;status.setText("Wybrano Manual bez nowego Confirm. Sprawdź znacznik przy Manual Mode w goglach.");}
-                    else {prepared=p;status.setText("Spójrz w gogle. Jeśli prawy przycisk to Confirm, dotknij kroku 2.");}
-                } else if(operation.equals("confirm"))status.setText("Zatwierdzono. Sprawdź w goglach, czy Manual jest wybrane.");
-                else status.setText("Klawisz przyjęty. Sprawdź reakcję w goglach.");
+                    if(p.verifyOnly) {prepared=null;status.setText(getString(R.string.already_manual));}
+                    else {prepared=p;status.setText(getString(R.string.confirm_ready));}
+                } else if(operation.equals("confirm"))status.setText(getString(R.string.confirmed));
+                else status.setText(getString(R.string.key_accepted));
                 updateControls();
             });
         });
@@ -202,7 +205,7 @@ public final class MainActivity extends Activity {
     private void updateControls() {
         if(connect==null)return;connect.setEnabled(!busy&&manager!=null);
         prepare.setEnabled(ready&&!busy);confirm.setEnabled(ready&&!busy&&prepared!=null);
-        stationary.setEnabled(!busy);stop.setEnabled(busy);
+        stationary.setEnabled(!busy);stop.setEnabled(busy);if(language!=null)language.setEnabled(!busy);
         for(Button b:controls)b.setEnabled(ready&&!busy);
     }
     private void post(Runnable action) {runOnUiThread(()->{if(alive&&!isFinishing())action.run();});}
@@ -211,33 +214,33 @@ public final class MainActivity extends Activity {
         journal.add(SystemClock.elapsedRealtime()+" "+line);
     }
     private void help() {
-        new AlertDialog.Builder(this).setTitle("Połączenie z goglami")
-            .setMessage("1. Połącz włączone N3 z telefonem przewodem USB z transmisją danych. Neo i RC3 pozostają połączone radiowo, nie przez USB.\n\n2. Zamknij DJI Fly. W oknie wyboru aplikacji USB wybierz N3 Manual i zaakceptuj zgodę Androida. Jeśli zawsze uruchamia się Fly, usuń jego domyślne otwieranie USB w ustawieniach aplikacji.\n\n3. Dotknij Połącz i sprawdź USB. Gdy menu odpowiada, uruchom krok 1. Patrząc w gogle, użyj kroku 2 tylko przy zaznaczonym prawym Confirm.\n\n4. Przy błędzie użyj Pokaż stan USB i zapisz raport. Możliwe są zarówno połączenie Android Accessory przez C–C, jak i host OTG. Nie potrzeba debugowania USB do korzystania z aplikacji.\n\n5. Ustawienia zmieniaj na ziemi, ze zdjętymi śmigłami i wyłączonymi silnikami. Przed lotem sprawdź przypisanie M w goglach. Aplikacja nie zamraża ustawień i nie naprawia firmware.")
-            .setPositiveButton("Rozumiem",null).show();
+        new AlertDialog.Builder(this).setTitle(getString(R.string.help_title))
+            .setMessage(getString(R.string.help_body))
+            .setPositiveButton(getString(R.string.understood),null).show();
     }
     private void diagnostics() {
-        if(manager==null) {new AlertDialog.Builder(this).setTitle("Diagnostyka USB").setMessage("System nie udostępnia usługi USB.").setPositiveButton("Zamknij",null).show();return;}
+        if(manager==null) {new AlertDialog.Builder(this).setTitle(getString(R.string.diagnostics_title)).setMessage(getString(R.string.no_usb_dialog)).setPositiveButton(getString(R.string.close),null).show();return;}
         StringBuilder s=new StringBuilder("Android "+Build.VERSION.RELEASE+" · "+Build.MODEL+"\n");
         s.append("Host USB: ").append(getPackageManager().hasSystemFeature("android.hardware.usb.host")).append('\n');
-        s.append("Urządzenia USB: ").append(manager.getDeviceList().size()).append('\n');
+        s.append(getString(R.string.devices_prefix)).append(manager.getDeviceList().size()).append('\n');
         UsbAccessory[] accessories=manager.getAccessoryList();
-        s.append("Akcesoria Android: ").append(accessories==null?0:accessories.length).append('\n');
+        s.append(getString(R.string.accessories_prefix)).append(accessories==null?0:accessories.length).append('\n');
         if(accessories!=null)for(UsbAccessory a:accessories) {
             s.append("AOA: ").append(a.getManufacturer()).append(" / ").append(a.getModel()).append(" / ").append(a.getDescription()).append('\n');
-            s.append("Zgoda AOA: ").append(manager.hasPermission(a)).append(" · rozpoznane DJI: ").append(AccessoryLink.candidate(a)).append('\n');
+            s.append(getString(R.string.permission_prefix)).append(manager.hasPermission(a)).append(getString(R.string.recognized_prefix)).append(AccessoryLink.candidate(a)).append('\n');
         }
         for(UsbDevice d:manager.getDeviceList().values()) {
             s.append(String.format(Locale.ROOT,"USB %04x:%04x · zgoda=%s\n",d.getVendorId(),d.getProductId(),manager.hasPermission(d)));
             for(int i=0;i<d.getInterfaceCount();i++) {
-                UsbInterface f=d.getInterface(i);s.append("IF ").append(f.getId()).append(" klasa ").append(f.getInterfaceClass()).append(" EP ");
+                UsbInterface f=d.getInterface(i);s.append("IF ").append(f.getId()).append(getString(R.string.interface_class)).append(f.getInterfaceClass()).append(" EP ");
                 for(int j=0;j<f.getEndpointCount();j++)s.append(String.format(Locale.ROOT,"%02x ",f.getEndpoint(j).getAddress()));s.append('\n');
             }
         }
-        new AlertDialog.Builder(this).setTitle("Diagnostyka USB").setMessage(s.toString())
-            .setPositiveButton("Zapisz raport",(dialog,which)-> {
+        new AlertDialog.Builder(this).setTitle(getString(R.string.diagnostics_title)).setMessage(s.toString())
+            .setPositiveButton(getString(R.string.save_report),(dialog,which)-> {
                 Intent save=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"N3Manual-raport.json");
                 startActivityForResult(save,50);
-            }).setNegativeButton("Zamknij",null).show();
+            }).setNegativeButton(getString(R.string.close),null).show();
     }
     @Override protected void onActivityResult(int request,int result,Intent data) {
         super.onActivityResult(request,result,data);
@@ -246,23 +249,38 @@ public final class MainActivity extends Activity {
             JSONObject report=new JSONObject();report.put("app","N3 Manual "+BuildConfig.VERSION_NAME);report.put("phone",Build.MODEL);report.put("android",Build.VERSION.RELEASE);
             report.put("firmware_modified",false);report.put("permanent_manual_fix",false);report.put("manual_result_requires_observation",true);
             synchronized(this){report.put("events",new JSONArray(journal));}
-            if(out==null)throw new Exception("Nie otwarto pliku.");out.write(report.toString(2).getBytes(StandardCharsets.UTF_8));
-            status.setText("Raport zapisany.");
-        } catch(Exception e) {status.setText("Nie zapisano raportu: "+e.getMessage());}
+            if(out==null)throw new UiFailure("error_report_open");out.write(report.toString(2).getBytes(StandardCharsets.UTF_8));
+            status.setText(getString(R.string.report_saved));
+        } catch(Exception e) {status.setText(getString(R.string.save_failed_prefix,e instanceof UiFailure?phrase(((UiFailure)e).key,((UiFailure)e).arguments):e.getMessage()));}
     }
     private void about() {
-        String info="N3 Manual "+BuildConfig.VERSION_NAME+"\nAutor: Grzegorz Staszczyk\nLicencja MIT\n\nNiezależne narzędzie do menu Goggles N3 + Neo + FPV Remote Controller 3. Bez powiązania z DJI. Inne zestawy nie są potwierdzone.\n\nAplikacja nie korzysta z internetu, konta, kamery ani mikrofonu. Raport jest w pamięci i zapisuje się tylko po wybraniu pliku. Zawiera model i wersję Androida oraz diagnostykę USB, bez numeru seryjnego telefonu.\n\nTesty emulatorów dotyczą zgodności aplikacji, nie fizycznego USB. Po użyciu sprawdź przypisanie Manual w goglach.\n\nFormat LogicLink: third-eye, William Robinet, MIT.";
-        new AlertDialog.Builder(this).setTitle("O aplikacji").setMessage(info)
-            .setPositiveButton("Zamknij",null)
-            .setNegativeButton("MIT aplikacji",(d,w)->showLicense("N3 Manual · MIT",R.raw.app_license))
-            .setNeutralButton("MIT third-eye",(d,w)->showLicense("third-eye · MIT",R.raw.third_eye_license)).show();
+        String info=getString(R.string.about_body,BuildConfig.VERSION_NAME);
+        new AlertDialog.Builder(this).setTitle(getString(R.string.about_title)).setMessage(info)
+            .setPositiveButton(getString(R.string.close),null)
+            .setNegativeButton(getString(R.string.app_license),(d,w)->showLicense("N3 Manual · MIT",R.raw.app_license))
+            .setNeutralButton(getString(R.string.third_eye_license),(d,w)->showLicense("third-eye · MIT",R.raw.third_eye_license)).show();
     }
     private void showLicense(String title,int resource) {
         try(java.io.InputStream stream=getResources().openRawResource(resource)) {
             java.io.ByteArrayOutputStream data=new java.io.ByteArrayOutputStream();byte[] bytes=new byte[1024];int n;
             while((n=stream.read(bytes))!=-1)data.write(bytes,0,n);
-            new AlertDialog.Builder(this).setTitle(title).setMessage(new String(data.toByteArray(),StandardCharsets.UTF_8)).setPositiveButton("Zamknij",null).show();
+            new AlertDialog.Builder(this).setTitle(title).setMessage(new String(data.toByteArray(),StandardCharsets.UTF_8)).setPositiveButton(getString(R.string.close),null).show();
         }catch(Exception e){status.setText(e.getMessage());}
+    }
+    private String phrase(String key,Object... args) {
+        Integer id=MessageResources.IDS.get(key);
+        if(id==null)throw new IllegalArgumentException("Unknown localized message: "+key);
+        return getString(id,args);
+    }
+    private void chooseLanguage() {
+        if(busy)return;
+        String[] modes={"system","en","pl"};
+        String current=AppLanguage.choice(this);int selected=Arrays.asList(modes).indexOf(current);
+        new AlertDialog.Builder(this).setTitle(R.string.language_title)
+            .setSingleChoiceItems(new String[]{getString(R.string.language_system),getString(R.string.language_english),getString(R.string.language_polish)},selected,(dialog,which)->{
+                dialog.dismiss();cancel.set(true);prepared=null;ready=false;
+                AppLanguage.set(this,modes[which]);
+            }).setNegativeButton(R.string.cancel,null).show();
     }
     private int dp(int n) {return Math.round(getResources().getDisplayMetrics().density*n);}
     private LinearLayout card() {

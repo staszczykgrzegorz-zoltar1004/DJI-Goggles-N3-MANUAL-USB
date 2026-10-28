@@ -23,7 +23,7 @@ public final class Duml {
             case "left": return 6; case "right": return 7;
             case "up": return 4; case "down": return 5;
             case "ok": return 1; case "back": return 2;
-            default: throw new IllegalArgumentException("Nieznany klawisz menu");
+            default: throw new UiFailure("error_unknown_key");
         }
     }
     public static byte[] read(int seq,int node,int field) {
@@ -31,7 +31,7 @@ public final class Duml {
     }
     public static byte[] read(int seq,int node,int field,int sender) {
         if(node<0||node>1024||!(field==0||field==2||field==3||field==4||field==9||field==11))
-            throw new IllegalArgumentException("Odczyt poza zakresem GUI");
+            throw new UiFailure("error_read_range");
         byte[] p=ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN)
             .putInt(node).putShort((short)field).put((byte)(field==9?1:0)).putShort((short)0).array();
         return guiFrame(seq,0,p,sender);
@@ -40,13 +40,13 @@ public final class Duml {
         return key(seq,name,event,10);
     }
     public static byte[] key(int seq,String name,int event,int sender) {
-        if(event!=0&&event!=1) throw new IllegalArgumentException("Zdarzenie klawisza");
+        if(event!=0&&event!=1) throw new UiFailure("error_key_event");
         byte[] p=ByteBuffer.allocate(12).order(ByteOrder.LITTLE_ENDIAN)
             .putInt(0).putShort((short)1).put((byte)event).putInt(keyCode(name)).put((byte)0).array();
         return guiFrame(seq,1,p,sender);
     }
     private static byte[] guiFrame(int seq,int cmd,byte[] p,int sender) {
-        if(sender!=2&&sender!=10)throw new IllegalArgumentException("Adres klienta GUI");
+        if(sender!=2&&sender!=10)throw new UiFailure("error_client_address");
         return frame(seq,sender,28,0x40,83,cmd,p);
     }
     private static byte[] frame(int seq,int sender,int receiver,int flags,int set,int cmd,byte[] p) {
@@ -80,7 +80,7 @@ public final class Duml {
     public static final class Parser {
         private byte[] buf=new byte[0];
         public List<byte[]> feed(byte[] data,int count) {
-            if(count<0||count>data.length||buf.length+count>65536) throw new IllegalArgumentException("USB buffer");
+            if(count<0||count>data.length||buf.length+count>65536) throw new UiFailure("error_usb_buffer");
             byte[] joined=Arrays.copyOf(buf,buf.length+count);
             System.arraycopy(data,0,joined,buf.length,count);
             List<byte[]> out=new ArrayList<>(); int i=0;

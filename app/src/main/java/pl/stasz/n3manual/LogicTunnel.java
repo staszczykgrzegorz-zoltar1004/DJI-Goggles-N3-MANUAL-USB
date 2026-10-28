@@ -12,7 +12,7 @@ public final class LogicTunnel {
         System.arraycopy(gui,0,out,8,gui.length);return out;
     }
     public List<byte[]> feed(byte[] bytes,int size) {
-        if(size<0||size>bytes.length||pending.length+size>131072)throw new IllegalArgumentException("LogicLink buffer");
+        if(size<0||size>bytes.length||pending.length+size>131072)throw new UiFailure("error_tunnel_buffer");
         byte[] all=Arrays.copyOf(pending,pending.length+size);System.arraycopy(bytes,0,all,pending.length,size);
         List<byte[]> controls=new ArrayList<>();int at=0;
         while(all.length-at>=8) {
